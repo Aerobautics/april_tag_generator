@@ -36,19 +36,26 @@ int main(int argc, char *argv[]) {
 
 int mainFunction() {
 	int i, j, k;
-	//cv::Mat aprilTag;
-	double temporary;
-	double pictureValues[APRIL_TAG_WIDTH][APRIL_TAG_WIDTH];
+	int choice;
+	int tagLength;
+	int imageWidth;
 	std::vector<std::vector<double>> imageValues;
 	std::string fileName;
-	std::vector<unsigned long> values;
+	std::string filePath;
+	std::string backgroundFile;
+	std::string rawAngles;
+	bool isBackgroundApplied = false;
 	unsigned long startValue;
 	unsigned long endValue;
 	unsigned long value;
+	unsigned long numberOfImages;
 	double mean = MAXIMUM_VALUE / 2;
 	double standardDeviation = MAXIMUM_VALUE / 8;
-	unsigned long numberOfImages;
-	int choice;
+	double temporary;
+	double pictureValues[APRIL_TAG_WIDTH][APRIL_TAG_WIDTH];
+	std::vector<unsigned long> values;
+	std::vector<double> angles;
+	cv::Mat backgroundImage;
 
 	cv::namedWindow("AprilTag", cv::WINDOW_NORMAL);
 	cv::resizeWindow("AprilTag", SD_WIDTH, SD_WIDTH);
@@ -132,6 +139,8 @@ int mainFunction() {
 			std::cin >> fileName;
 			break;
 		case 5:
+			std::cout << "Enter file path: ";
+			std::cin >> filePath;
 			break;
 		case 6:
 			values = normalImages(numberOfImages, mean, standardDeviation);
@@ -161,13 +170,34 @@ int mainFunction() {
 			std::cin >> numberOfImages;
 			break;
 		case 10:
-			printHelp();
+			std::cout << "Enter rotation angles: ";
+			std::cin >> rawAngles;
 			break;
 		case 11:
-			rotateImage();
+			if (isBackgroundApplied) {
+				isBackgroundApplied = false;
+				std::cout << "Background is off." << std::endl;
+			} else {
+				isBackgroundApplied = true;
+				std::cout << "Background is on." << std::endl;
+			}
 			break;
 		case 12:
-			applyBackground();
+			std::cout << "Enter background file: ";
+			std::cin >> backgroundFile;
+			break;
+		case 13:
+			std::cout << "Enter tag length: ";
+			std::cin >> tagLength;
+			break;
+		case 14:
+			std::cout << "Enter image width: ";
+			std::cin >> imageWidth;
+			break;
+		case 15:
+			printHelp();
+			break;
+		case 16:
 			break;
 		default:
 			std::cout << "Invalid choice!" << std::endl;
@@ -188,13 +218,18 @@ void displayMenu() {
 	std::cout << "2. Change start value" << std::endl;
 	std::cout << "3. Change end value" << std::endl;
 	std::cout << "4. Change filename" << std::endl;
+	std::cout << "5. Change file path" << std::endl;
 	std::cout << "6. Generate normal images" << std::endl;
 	std::cout << "7. Change mean" << std::endl;
 	std::cout << "8. Change deviation" << std::endl;
 	std::cout << "9. Change number of images" << std::endl;
-	std::cout << "10. Help" << std::endl;
-	std::cout << "11. Rotate" << std::endl;
-	std::cout << "12. Apply background" << std::endl;
+	std::cout << "10. Rotation angles" << std::endl;
+	std::cout << "11. Apply/remove background" << std::endl;
+	std::cout << "12. Assign background image" << std::endl;
+	std::cout << "13. Adjust tag length" << std::endl;
+	std::cout << "14. Adjust image size" << std::endl;
+	std::cout << "15. Help" << std::endl;
+	std::cout << "16: Settings" << std::endl;
 	std::cout << "Enter choice: ";
 }
 
@@ -438,11 +473,18 @@ void printHelp() {
 	std::cout << "(2) Change start value - Change start value" << std::endl;
 	std::cout << "(3) Change end value - Change end value" << std::endl;
 	std::cout << "(4) Change filename - Change filename under which images are stored" << std::endl;
+	std::cout << "(5) Change file path - Change the path under which images are stored" << std::endl;
 	std::cout << "(6) Generate normal images - Create images with a random value of normal distribution" << std::endl;
 	std::cout << "(7) Change mean - Change mean which is is used for generating normal image distribution" << std::endl;
 	std::cout << "(8) Change deviation - Change standard deviation of normal image distribution" << std::endl;
 	std::cout << "(9) Change number of images - Change the number of images generated with (6)" << std::endl;
-	std::cout << "(10) Help - Display information on selections" << std::endl;
+	std::cout << "(10) Rotation angles - Enter the angles at which the Apriltags will be rotated" << std::endl;
+	std::cout << "(11) Apply/remove background - Apply or remove the current background image" << std::endl;
+	std::cout << "(12) Assign background image -  Change filename of background image" << std::endl;
+	std::cout << "(13) Adjust tag lengt - Change the length of the Apriltag image" << std::endl;
+	std::cout << "(14) Adjust image size - Change the size of the image which contains the Apriltag" << std::endl;
+	std::cout << "(15) Help - Display information on selections" << std::endl;
+	std::cout << "(16) Settings - Display current settings" << std::endl;
 }
 
 void rotateImage() {
